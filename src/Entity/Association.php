@@ -129,6 +129,12 @@ class Association
     private $isList;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"light", "get_full_asso"})
+     */
+    private $type;
+
+    /**
      * @ORM\Column(type="boolean", options={"default" : true})
      * @Groups({"light", "get_full_asso"})
      */
@@ -336,6 +342,18 @@ class Association
         return $this;
     }
 
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
     public function getColor2(): ?string
     {
         return $this->color2;
@@ -383,6 +401,4 @@ class Association
 
         return $this;
     }
-
-
 }
