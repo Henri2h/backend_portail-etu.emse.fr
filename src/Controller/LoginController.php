@@ -75,7 +75,7 @@ class LoginController extends AbstractController
                     $authenticated_user["contributeBDE"] = $user->getContributeBDE();
                     $authenticated_user["token"] = [];
                     $authenticated_user["token"]["bearer"] = $jwt;
-                    $authenticated_user["token"]["exp"] = time() + 86400;
+                    $authenticated_user["token"]["exp"] = time() + 31536000;
 
                     $responseData = array(
                         "authenticated" => true,
