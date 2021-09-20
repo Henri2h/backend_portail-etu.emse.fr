@@ -57,6 +57,12 @@ class Event
      * @ORM\Column(type="string", length=255)
      * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
      */
+    private $type;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     */
     private $name;
 
     /**
@@ -264,6 +270,17 @@ class Event
         return $this;
     }
 
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -337,7 +354,7 @@ class Event
 
         return $this;
     }
-    
+
     public function getShotgunListLength(): ?int
     {
         return $this->shotgunListLength;
