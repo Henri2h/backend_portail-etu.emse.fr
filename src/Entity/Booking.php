@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Datetime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -118,6 +119,12 @@ class Booking
      * @Groups({"post_booking", "put_booking", "get_booking"})
      */
     private $cercleOperationAmount;
+
+     /**
+     * @ORM\Column(name="date", type="datetime")
+     *  @Groups({"get_booking", "post_booking", "get_event_bookings"})
+     */
+    private $date;
 
     public function __construct()
     {
@@ -312,6 +319,18 @@ class Booking
     public function setCercleOperationAmount(?float $cercleOperationAmount): self
     {
         $this->cercleOperationAmount = $cercleOperationAmount;
+
+        return $this;
+    }
+
+    public function getDate(): ?DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTimeInterface $date): self
+    {
+        $this->date = $date;
 
         return $this;
     }
