@@ -120,7 +120,7 @@ class Booking
      */
     private $cercleOperationAmount;
 
-     /**
+    /**
      * @ORM\Column(name="date", type="datetime")
      *  @Groups({"get_booking", "post_booking", "get_event_bookings"})
      */
@@ -130,6 +130,7 @@ class Booking
     {
         $this->createdAt = new DateTime();
         $this->formOutputs = new ArrayCollection();
+        $this->date = new DateTime('1900-01-01T0:0:0Z');
     }
 
     /**
