@@ -35,7 +35,7 @@ class ExcelController extends AbstractController
 
         $event = $this->eventRepositery->find($eventId);
         $now = new \DateTime();
-        $name = $this->slugify($event->getName()).'_du_'.$event->getDate()->format('d-m-Y').'_le_'.$now->format('d-m-Y_H\hi').'.xlsx';
+        $name = $this->slugify($event->getName()).'_du_'.$event->getDate()->format('d-m-Y').'_le_'.$now->format('d-m-Y_H\hi').uniqid().'.xlsx';
         $bookings = $event->getBookings();
 
         $spreadsheet = new Spreadsheet();
