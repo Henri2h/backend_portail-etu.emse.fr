@@ -14,15 +14,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+use Symfony\Component\Security\Core\Security;
+
 class ExcelController extends AbstractController
 {
     private $logger;
     private $eventRepositery;
 
-    public function __construct(LoggerInterface $logger, EventRepository $eventRepository)
+    public function __construct(LoggerInterface $logger, EventRepository $eventRepository, Security $security)
     {
         $this->logger = $logger;
         $this->eventRepositery = $eventRepository;
+        $this->security = $security;
     }
 
     /**
@@ -30,12 +33,13 @@ class ExcelController extends AbstractController
      */
     public function index($eventId)
     {
-
-
-
         $event = $this->eventRepositery->find($eventId);
+        
+        // check if the user is an admin BDE or can edit events for this event
+        if (!($this->security->isGranted('ROLE_R0_A1') || $this->security->isGranted('ROLE_R3_A' . $event->getAssociation()->getId()))) return;
+
         $now = new \DateTime();
-        $name = $this->slugify($event->getName()).'_du_'.$event->getDate()->format('d-m-Y').'_le_'.$now->format('d-m-Y_H\hi').uniqid().'.xlsx';
+        $name = $this->slugify($event->getName()) . '_du_' . $event->getDate()->format('d-m-Y') . '_le_' . $now->format('d-m-Y_H\hi') . uniqid() . '.xlsx';
         $bookings = $event->getBookings();
 
         $spreadsheet = new Spreadsheet();
@@ -53,87 +57,79 @@ class ExcelController extends AbstractController
 
         if (!is_null($event->getPrice())) {
             array_push($cols, ['type' => 'paid', 'index' => $colIndex]);
-            $sheet->setCellValue($this->colName($colIndex).'1', 'Payé ?');
-            $colIndex ++;
+            $sheet->setCellValue($this->colName($colIndex) . '1', 'Payé ?');
+            $colIndex++;
 
             array_push($cols, ['type' => 'paymentMeans', 'index' => $colIndex]);
-            $sheet->setCellValue($this->colName($colIndex).'1', 'Moyen de paiement');
-            $colIndex ++;
+            $sheet->setCellValue($this->colName($colIndex) . '1', 'Moyen de paiement');
+            $colIndex++;
         }
 
         foreach ($event->getFormInputs() as $formInput) {
             if ($formInput->getType() === 'text') {
                 array_push($cols, ['type' => 'text', 'index' => $colIndex, 'formInput' => $formInput]);
-                $sheet->setCellValue($this->colName($colIndex).'1', $formInput->getTitle());
-                $colIndex ++;
+                $sheet->setCellValue($this->colName($colIndex) . '1', $formInput->getTitle());
+                $colIndex++;
             } elseif ($formInput->getType() === 'singleOption') {
                 array_push($cols, ['type' => 'singleOption', 'index' => $colIndex, 'formInput' => $formInput]);
-                $sheet->setCellValue($this->colName($colIndex).'1', $formInput->getTitle());
-                $colIndex ++;
+                $sheet->setCellValue($this->colName($colIndex) . '1', $formInput->getTitle());
+                $colIndex++;
             } elseif ($formInput->getType() === 'multipleOptions') {
                 foreach ($formInput->getOptions() as $option) {
                     array_push($cols, ['type' => 'multipleOptions', 'index' => $colIndex, 'formInput' => $formInput, 'option' => $option]);
-                    $sheet->setCellValue($this->colName($colIndex).'1', $formInput->getTitle().' '.$option->getValue());
-                    $colIndex ++;
+                    $sheet->setCellValue($this->colName($colIndex) . '1', $formInput->getTitle() . ' ' . $option->getValue());
+                    $colIndex++;
                 }
             }
         }
-//        $sheet->setCellValue('D1', $name);
+        //        $sheet->setCellValue('D1', $name);
 
         $index = 2;
         foreach ($bookings as $booking) {
             $formOutputs = $booking->getFormOutputs();
             foreach ($cols as $col) {
                 if ($col['type'] === 'date') {
-                    $sheet->setCellValue($this->colName($col['index']).$index, $booking->getCreatedAt());
-
+                    $sheet->setCellValue($this->colName($col['index']) . $index, $booking->getCreatedAt());
                 } elseif ($col['type'] === 'name') {
                     if (is_null($booking->getUser())) {
-                        $sheet->setCellValue($this->colName($col['index']).$index, $booking->getUserName());
+                        $sheet->setCellValue($this->colName($col['index']) . $index, $booking->getUserName());
                     } else {
-                        $sheet->setCellValue($this->colName($col['index']).$index, $booking->getUser()->getFirstname().' '.$booking->getUser()->getLastname());
+                        $sheet->setCellValue($this->colName($col['index']) . $index, $booking->getUser()->getFirstname() . ' ' . $booking->getUser()->getLastname());
                     }
-
                 } elseif ($col['type'] === 'checked') {
-                    $sheet->setCellValue($this->colName($col['index']).$index, $booking->getChecked());
-
+                    $sheet->setCellValue($this->colName($col['index']) . $index, $booking->getChecked());
                 } elseif ($col['type'] === 'paid') {
-                    $sheet->setCellValue($this->colName($col['index']).$index, $booking->getPaid());
-
+                    $sheet->setCellValue($this->colName($col['index']) . $index, $booking->getPaid());
                 } elseif ($col['type'] === 'paymentMeans' and $booking->getPaymentMeans()) {
-                    $sheet->setCellValue($this->colName($col['index']).$index, $booking->getPaymentMeans()->getName());
-
+                    $sheet->setCellValue($this->colName($col['index']) . $index, $booking->getPaymentMeans()->getName());
                 } elseif ($col['type'] === 'text') {
                     foreach ($formOutputs as $formOutput) {
                         if ($formOutput->getFormInput() == $col['formInput']) {
-                            $sheet->setCellValue($this->colName($col['index']).$index, $formOutput->getAnswer());
+                            $sheet->setCellValue($this->colName($col['index']) . $index, $formOutput->getAnswer());
                         }
                     }
-
                 } elseif ($col['type'] === 'singleOption') {
                     foreach ($formOutputs as $formOutput) {
                         $options = $formOutput->getOptions();
                         if ($formOutput->getFormInput() == $col['formInput'] and count($options) > 0) {
-                            $sheet->setCellValue($this->colName($col['index']).$index, $options[0]->getValue());
+                            $sheet->setCellValue($this->colName($col['index']) . $index, $options[0]->getValue());
                         }
                     }
-
                 } elseif ($col['type'] === 'multipleOptions') {
                     foreach ($formOutputs as $formOutput) {
                         $options = $formOutput->getOptions();
                         if ($formOutput->getFormInput() == $col['formInput'] and count($options) > 0) {
                             foreach ($options as $option) {
                                 if ($option == $col['option']) {
-                                    $sheet->setCellValue($this->colName($col['index']).$index, 1);
+                                    $sheet->setCellValue($this->colName($col['index']) . $index, 1);
                                 }
                             }
-
                         }
                     }
                 }
             }
-            
-            $index ++;
+
+            $index++;
         }
 
         $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
@@ -150,7 +146,7 @@ class ExcelController extends AbstractController
 
 
         // Create the file
-        $writer->save(__DIR__.'/../../public/excel/'.$name);
+        $writer->save(__DIR__ . '/../../public/excel/' . $name);
 
         $responseData = array(
             "name" => $name
@@ -187,21 +183,23 @@ class ExcelController extends AbstractController
 
     public static function colName($index)
     {
-        $colName = ['A', 'B', 'C', 'D', 'E',
-        'F', 'G', 'H', 'I', 'J',
-        'K', 'L', 'M', 'N', 'O',
-        'P', 'Q', 'R', 'S', 'T',
-        'U', 'V', 'W', 'X', 'Y',
-        'Z'];
+        $colName = [
+            'A', 'B', 'C', 'D', 'E',
+            'F', 'G', 'H', 'I', 'J',
+            'K', 'L', 'M', 'N', 'O',
+            'P', 'Q', 'R', 'S', 'T',
+            'U', 'V', 'W', 'X', 'Y',
+            'Z'
+        ];
 
-        $a = $index%26;
+        $a = $index % 26;
         $b = intdiv($index, 26);
         if ($b === 0) {
-            return $colName[$a-1];
+            return $colName[$a - 1];
         } elseif ($a === 0) {
             return $colName[25];
         } else {
-            return $colName[$b-1].$colName[$a-1];
+            return $colName[$b - 1] . $colName[$a - 1];
         }
     }
 }
