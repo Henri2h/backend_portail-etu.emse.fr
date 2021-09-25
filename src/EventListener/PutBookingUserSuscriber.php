@@ -55,24 +55,19 @@ final class PutBookingUserSuscriber implements EventSubscriberInterface
         $request = $event->getRequest();
 
         $set_user = true;
-        $put = false;
         if ('api_bookings_post_collection' === $request->attributes->get('_route')) {
             $set_user = true;
         } else if ('api_bookings_put_validated_by_item' === $request->attributes->get('_route')) {
             $set_user = false;
         } else return;
 
-        $this->logger->debug("app set_user : " . $set_user);
-
-        // maybe these extra null checks are not even needed
         $token = $this->tokenStorage->getToken();
 
-        if ($token) {
+        if ($token) { // if token is not null
             $owner = $token->getUser();
             if ($owner instanceof User) {
                 if ($set_user) {
                     $entity->setUser($owner);
-                    
                 } else {
                     $entity->setValidatedBy($owner);
                 }
@@ -80,6 +75,7 @@ final class PutBookingUserSuscriber implements EventSubscriberInterface
             }
         }
 
+        // if not, the user is not valid
         $responseData = array(
             "message" => "Invalid user"
         );
