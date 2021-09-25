@@ -9,6 +9,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Psr\Log\LoggerInterface;
+
+
+use Symfony\Component\Security\Core\Security;
+
+
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Decoder\JWTDecoderInterface;
+
 //*              "access_control"="(is_granted('ROLE_USER') and object.getUser() == user) or is_granted('ROLE_R0_A1')",
 
 /**
@@ -24,6 +33,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     itemOperations={
  *          "get"={"normalization_context"={"groups"={"get_booking"}}},
  *          "delete"={"access_control"="(is_granted('ROLE_USER') and object.getUser() == user) or is_granted('ROLE_R0_A1') or ('ROLE_R3_A'~object.getEvent().getAssociation().getId() in roles)"},
+ *          "put_validated_by"={
+ *              "method"="PUT",
+ *              "path"="/bookings/{id}/validate",
+ *              "normalization_context"={"groups"={"set_validated_by"},
+ *              "access_control"="is_granted('ROLE_R0_A1') or ('ROLE_R3_A'~object.getEvent().getAssociation().getId() in roles)"}
+ *        
+ *          },
  *          "put"={
  *              "normalization_context"={"groups"={"get_booking"}},
  *              "denormalization_context"={"groups"={"put_booking"}},
@@ -63,14 +79,14 @@ class Booking
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="bookings")
-     * @Groups({"get_booking", "get_bookings", "post_booking", "put_booking", "get_event_bookings", "event_get"})
+     * @Groups({"get_booking", "get_bookings", "post_booking", "get_event_bookings", "event_get"})
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Event", inversedBy="bookings")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"get_booking", "get_bookings", "post_booking", "user_info", "get_user", "put_booking"})
+     * @Groups({"get_booking", "get_bookings", "post_booking", "user_info", "get_user"})
      */
     private $event;
 
@@ -108,6 +124,18 @@ class Booking
      * @Groups({"get_booking", "post_booking", "put_booking", "get_event_bookings"})
      */
     private $checked = false;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=false)
+     * @Groups({"get_booking", "get_event_bookings", "set_validated_by"})
+     */
+    private $validated = false;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="bookings")
+     * @Groups({"get_booking", "get_event_bookings", "set_validated_by"})
+     */
+    private $validatedBy;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -214,6 +242,28 @@ class Booking
         return $this;
     }
 
+    public function getValidated(): ?bool
+    {
+        return $this->validated;
+    }
+
+    public function setValidated(?bool $validated): self
+    {
+        $this->validated = $validated;
+        return $this;
+    }
+
+    public function getValidatedBy(): ?User
+    {
+        return $this->validatedBy;
+    }
+
+    public function setValidatedBy(?User $user): self
+    {
+        $this->validatedBy = $user;
+        return $this;
+    }
+
     public function getEvent(): ?Event
     {
         return $this->event;
@@ -245,7 +295,6 @@ class Booking
 
     public function setOperation(?Operation $operation): self
     {
-
         $this->operation = $operation;
 
         // set (or unset) the owning side of the relation if necessary

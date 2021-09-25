@@ -37,46 +37,49 @@ final class PutBookingSubscriber implements EventSubscriberInterface
 
     public function putBooking(RequestEvent $event)
     {
-
         $request = $event->getRequest();
-
 
         if ('api_bookings_put_item' !== $request->attributes->get('_route')) {
             return;
         }
-//        $this->logger->info('hola');
-        //$this->logger->info(var_export($request->attributes));
+
+        // get booking id
+        $id_matches = [];
+        preg_match('/([0-9]+)/', $request->getRequestUri(), $id_matches);
+        $id = $id_matches[0];
+
         $this->logger->info($request->getContent());
         $data = json_decode($request->getContent(), true);
-        $oldBooking = $this->repository->find($data['id']);
+
+        $oldBooking = $this->repository->find($id);
         $em = $this->doctrine->getManager();
-        if (isset($data['operation']) and !array_key_exists('id',$data['operation'])) {
-//            $this->logger->info('OldBookingId = '.$oldBooking->getId());
-//            $this->logger->info('OldBookingOperation = '.$oldBooking->getOperation()->getId());
+        if (isset($data['operation']) and !array_key_exists('id', $data['operation'])) {
+            //            $this->logger->info('OldBookingId = '.$oldBooking->getId());
+            //            $this->logger->info('OldBookingOperation = '.$oldBooking->getOperation()->getId());
             $matches = [];
-            preg_match('/([0-9]+)/', $data['operation']['paymentMeans'], $matches);
+            preg_match('([0-9]+)', $data['operation']['paymentMeans'], $matches);
             if ($matches[0] == '1') {
                 $oldOperation = $oldBooking->getOperation();
                 $em = $this->doctrine->getManager();
                 if (!is_null($oldOperation)) {
-//                $this->logger->info('OldOperationId = '.$oldOperation->getId());
-//            $em->flush();
-                    $oldOperation->getUser()->setBalance($oldOperation->getUser()->getBalance()+$data['operation']['amount']);
+                    //                $this->logger->info('OldOperationId = '.$oldOperation->getId());
+                    //            $em->flush();
+                    $oldOperation->getUser()->setBalance($oldOperation->getUser()->getBalance() + $data['operation']['amount']);
                     $em->remove($oldOperation);
                     $em->flush();
                 } else {
                     //$data['operation']['user'] = 'http://portail-test-api.emse.fr/index.php/api/users/1';
                     $array = explode('/', $data['operation']['user']);
-//                $this->logger->info('array[2] : '.$array[2]);
+                    //                $this->logger->info('array[2] : '.$array[2]);
                     $userId = end($array);
-//                $this->logger->info('userId : '.$userId);
+                    //                $this->logger->info('userId : '.$userId);
                     $user = $this->userRepository->find($userId);
-                    $user->setBalance($user->getBalance()+$data['operation']['amount']);
+                    $user->setBalance($user->getBalance() + $data['operation']['amount']);
                     $em->flush();
                 }
             }
-        } elseif (array_key_exists('operation',$data) and is_null($data['operation'])) {
-//            $this->logger->info('data operation= '.$data['operation']);
+        } elseif (array_key_exists('operation', $data) and is_null($data['operation'])) {
+            //            $this->logger->info('data operation= '.$data['operation']);
             $oldOperation = $oldBooking->getOperation();
             $em = $this->doctrine->getManager();
             if (!is_null($oldOperation)) {
@@ -96,18 +99,18 @@ final class PutBookingSubscriber implements EventSubscriberInterface
             'PWD' => $_ENV['CERCLE_API_PWD'],
         ];
 
-        if (!is_null($operationId) and array_key_exists('cercleOperationAmount',$data) and ( $data['cercleOperationAmount'] != $amount or is_null($data['cercleOperationAmount']))){
-            $body = json_encode(["id"=>$operationId]);
+        if (!is_null($operationId) and array_key_exists('cercleOperationAmount', $data) and ($data['cercleOperationAmount'] != $amount or is_null($data['cercleOperationAmount']))) {
+            $body = json_encode(["id" => $operationId]);
 
             $client->delete('delete_transaction.php', ['headers' => $headers, 'body' => $body]);
             $oldBooking->setCercleOperationId(null);
             $em->flush();
         }
-        if(isset($data['cercleOperationAmount']) and $data['cercleOperationAmount'] != $amount) {
-            $body=[];
-            $body["amount"]=$data['cercleOperationAmount'];
-            $body["eventName"]=$oldBooking->getEvent()->getName();
-            $body["login"]=$oldBooking->getUser()->getLogin();
+        if (isset($data['cercleOperationAmount']) and $data['cercleOperationAmount'] != $amount) {
+            $body = [];
+            $body["amount"] = $data['cercleOperationAmount'];
+            $body["eventName"] = $oldBooking->getEvent()->getName();
+            $body["login"] = $oldBooking->getUser()->getLogin();
             $body = json_encode($body);
 
             $response = $client->get('create_transaction.php', ['headers' => $headers, 'body' => $body]);
