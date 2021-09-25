@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ExcelController extends AbstractController
 {
@@ -36,7 +37,7 @@ class ExcelController extends AbstractController
         $event = $this->eventRepositery->find($eventId);
         
         // check if the user is an admin BDE or can edit events for this event
-        if (!($this->security->isGranted('ROLE_R0_A1') || $this->security->isGranted('ROLE_R3_A' . $event->getAssociation()->getId()))) return;
+        if (!($this->security->isGranted('ROLE_R0_A1') || $this->security->isGranted('ROLE_R3_A' . $event->getAssociation()->getId())))  throw new AccessDeniedException();;
 
         $now = new \DateTime();
         $name = $this->slugify($event->getName()) . '_du_' . $event->getDate()->format('d-m-Y') . '_le_' . $now->format('d-m-Y_H\hi') . uniqid() . '.xlsx';
