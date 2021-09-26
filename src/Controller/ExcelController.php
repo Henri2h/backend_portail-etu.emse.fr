@@ -21,6 +21,7 @@ class ExcelController extends AbstractController
 {
     private $logger;
     private $eventRepositery;
+    private $security;
 
     public function __construct(LoggerInterface $logger, EventRepository $eventRepository, Security $security)
     {
