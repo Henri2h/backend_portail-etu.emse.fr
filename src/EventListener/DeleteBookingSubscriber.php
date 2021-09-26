@@ -62,17 +62,7 @@ final class DeleteBookingSubscriber implements EventSubscriberInterface
         if ('api_bookings_delete_item' !== $request->attributes->get('_route')) {
             return;
         }
-
-      // check if the user is an admin BDE or can edit events for this event
-      if (!($this->security->isGranted('ROLE_R0_A1') || $this->security->isGranted('ROLE_R3_A' . $event->getAssociation()->getId())))  throw new AccessDeniedException();;
-
-         // if not, the user is not valid
-         $responseData = array(
-            "message" => "Invalid user"
-        );
-        $response = new JsonResponse($responseData, Response::HTTP_UNAUTHORIZED);
-        $event->setResponse($response);
-
+        
         $path = $request->getPathInfo();
         $this->logger->info($path);
         $path = explode("/", $path);
