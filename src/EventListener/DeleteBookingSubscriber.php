@@ -89,7 +89,7 @@ final class DeleteBookingSubscriber implements EventSubscriberInterface
         $owner = $token->getUser();
         
         $isAdminOnEvent = $this->security->isGranted('ROLE_R0_A1') || $this->security->isGranted('ROLE_R3_A' . $oldBooking->getEvent()->getAssociation()->getId());
-        if( !$oldBooking->getValidated() && $owner == $oldBooking->getUser() || $isAdminOnEvent ){
+        if( (!$oldBooking->getValidated() && $owner == $oldBooking->getUser() || $isAdminOnEvent) == false ){
               throw new AccessDeniedException();
         }
 
