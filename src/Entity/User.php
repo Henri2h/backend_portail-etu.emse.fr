@@ -46,7 +46,7 @@ class User implements UserInterface
      * @ORM\Column(type="integer", unique=true)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"get_user", "get_full_asso", "user_light", "get_event_bookings", "event_get"})
+     * @Groups({"get_user", "get_full_asso", "user_light", "get_event_bookings", "get_booking", "event_get"})
      */
     private $id;
 
@@ -67,13 +67,13 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=191, nullable=true)
-     * @Groups({"get_user", "get_full_asso", "user_light", "get_event_bookings", "user_info", "event_get", "put_user", "get_operations"})
+     * @Groups({"get_user", "get_full_asso", "user_light", "get_event_bookings", "get_booking", "user_info", "event_get", "put_user", "get_operations"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=191, nullable=true)
-     * @Groups({"get_user", "get_full_asso", "user_light", "get_event_bookings", "user_info", "event_get", "put_user", "get_operations"})
+     * @Groups({"get_user", "get_full_asso", "user_light", "get_event_bookings", "get_booking", "user_info", "event_get", "put_user", "get_operations"})
      */
     private $lastname;
 
@@ -96,7 +96,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"get_user", "get_full_asso", "user_light", "user_info", "get_event_bookings", "put_user", "get_operations"})
+     * @Groups({"get_user", "get_full_asso", "user_light", "user_info", "get_event_bookings", "get_booking", "put_user", "get_operations"})
      */
     private $promo;
 
@@ -134,6 +134,14 @@ class User implements UserInterface
      * @Groups({"user_info"})
      */
     private $eventsBooked;
+
+
+    /**
+     * @Groups({"user_info"})
+     */
+    private $roles;
+
+    
 
 
     public function __construct()
