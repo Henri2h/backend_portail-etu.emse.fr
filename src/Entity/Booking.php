@@ -150,7 +150,7 @@ class Booking
 
     /**
      * @ORM\Column(name="date", type="datetime")
-     *  @Groups({"get_booking", "post_booking", "get_event_bookings"})
+     *  @Groups({"get_booking", "post_booking", "get_event_bookings", "user_info"})
      */
     private $date;
 
