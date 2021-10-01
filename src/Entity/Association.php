@@ -58,7 +58,7 @@ class Association
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"get_full_asso"})
+     * @Groups({"get_full_asso", "light"})
      */
     private $description;
 
@@ -90,7 +90,7 @@ class Association
      * @var ImgObject|null
      * @ORM\OneToOne(targetEntity="App\Entity\ImgObject", orphanRemoval=true)
      * @ORM\JoinColumn(nullable=true)
-     * @Groups({"get_full_asso", "events_get"})
+     * @Groups({"get_full_asso", "events_get", "light"})
      */
     public $logo;
 
