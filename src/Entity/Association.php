@@ -40,13 +40,13 @@ class Association
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"light", "get_full_asso", "event_get", "get_booking", "events_get", "get_user"})
+     * @Groups({"light", "get_full_asso", "event_get", "get_booking", "events_get", "user_info"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"light", "get_full_asso", "event_get", "get_booking", "events_get", "get_user"})
+     * @Groups({"light", "get_full_asso", "event_get", "get_booking", "events_get", "user_info"})
      */
     private $name;
 
@@ -90,7 +90,7 @@ class Association
      * @var ImgObject|null
      * @ORM\OneToOne(targetEntity="App\Entity\ImgObject", orphanRemoval=true)
      * @ORM\JoinColumn(nullable=true)
-     * @Groups({"get_full_asso", "events_get", "light"})
+     * @Groups({"get_full_asso", "events_get", "light", "user_info"})
      */
     public $logo;
 

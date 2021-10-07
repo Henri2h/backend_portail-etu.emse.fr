@@ -55,31 +55,31 @@ class Event
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user", "user_info"})
      */
     private $type;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user", "user_info"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "user_info"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user", "user_info"})
      */
     private $date;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user", "user_info"})
      */
     private $price;
 
@@ -115,20 +115,20 @@ class Event
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user", "user_info"})
      */
     private $closingDate;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Association", inversedBy="events")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_user", "user_info"})
      */
     private $association;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"event_post", "event_get", "get_booking", "events_get"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "user_info"})
      */
     private $duration;
 
@@ -140,7 +140,7 @@ class Event
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"event_post", "event_get", "events_get", "get_booking", "get_full_asso"})
+     * @Groups({"event_post", "event_get", "events_get", "get_booking", "get_full_asso", "user_info"})
      */
     private $status;
 
@@ -152,13 +152,13 @@ class Event
 
     /**
      * @ORM\Column(name="event_open", type="boolean")
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "user_info"})
      */
     private $open;
 
     /**
      * @ORM\Column(name="public_event", type="boolean")
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "user_info"})
      */
     private $publicEvent;
 
@@ -179,7 +179,7 @@ class Event
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\ImgObject", cascade={"persist", "remove"})
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "user_info"})
      */
     private $img;
 
@@ -191,7 +191,7 @@ class Event
 
     /**
      * @ORM\Column(type="boolean", options={"default" : true})
-     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user"})
+     * @Groups({"event_post", "event_get", "get_booking", "events_get", "get_full_asso", "get_user", "user_info"})
      */
     private $isBookable;
 

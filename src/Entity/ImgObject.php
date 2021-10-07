@@ -48,7 +48,7 @@ class ImgObject
     /**
      * @var string|null
      * @ORM\Column(nullable=true)
-     * @Groups({"get_full_asso", "light", "event_get", "get_booking", "events_get"})
+     * @Groups({"get_full_asso", "light", "event_get", "get_booking", "events_get", "user_info"})
      */
     public $filename;
 

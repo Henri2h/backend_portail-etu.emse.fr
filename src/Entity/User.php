@@ -114,7 +114,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Booking", mappedBy="user")
-     * @Groups({"get_user", "user_info"})
+     * @Groups({"user_info"})
      */
     private $bookings;
 
