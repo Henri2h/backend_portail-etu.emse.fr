@@ -37,13 +37,13 @@ class Role
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get_role", "get_full_asso"})
+     * @Groups({"get_role", "get_full_asso", "user_info"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"get_role", "get_full_asso", "position_post"})
+     * @Groups({"get_role", "get_full_asso", "position_post", "user_info"})
      */
     private $name;
 

@@ -31,7 +31,7 @@ class Position
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"get_full_asso"})
+     * @Groups({"get_full_asso", "user_info"})
      */
     private $id;
 
@@ -45,14 +45,14 @@ class Position
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Association", inversedBy="positions")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"position_post"})
+     * @Groups({"position_post", "user_info"})
      */
     private $association;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Role", inversedBy="positions", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"get_full_asso", "position_post"})
+     * @Groups({"get_full_asso", "position_post", "user_info"})
      */
     private $role;
 

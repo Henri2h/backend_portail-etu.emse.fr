@@ -91,6 +91,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Position", mappedBy="user", orphanRemoval=true)
+     * @Groups({"user_info"})
      */
     private $positions;
 
